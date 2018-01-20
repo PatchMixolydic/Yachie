@@ -1,4 +1,4 @@
-# Yet Another Chip-8 Emulator/Interpreter (Yachie)
+# Yet Another Chip-8 Interpreter/Emulator (Yachie)
 Chip-8 Emulator written in C++. Not done yet.
 
 ## Dependencies
