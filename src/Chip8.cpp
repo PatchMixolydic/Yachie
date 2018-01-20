@@ -39,6 +39,13 @@ void Chip8::load(std::string filename) {
 }
 
 void Chip8::step() {
+    if (state.pc > MEMORY_SIZE) {
+        std::stringstream message;
+        message << std::hex;
+        message << "PC went out of bounds at 0x";
+        message << (state.pc);
+        throw std::out_of_range(message.str());
+    }
     uint16_t opcode = state.memory[state.pc] << 8 | state.memory[state.pc + 1];
     state.pc += OPCODE_SIZE;
     if (opcode == 0x00E0) {
