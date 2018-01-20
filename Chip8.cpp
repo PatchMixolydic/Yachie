@@ -29,11 +29,24 @@ void Chip8::load(std::string filename) {
         std::cerr << "Couldn't load rom " << filename << std::endl;
         return;
     }
+    initState();
     // seems hacky, that's what I get for using uint8_t
     char c;
     int offset = PROGRAM_OFFSET;
     while (romFile.get(c)) {
         state.memory[offset] = (uint8_t)c;
         offset++;
+    }
+}
+
+void Chip8::step() {
+    std::cout << "Step" << std::endl;
+}
+
+void Chip8::tickTimers() {
+    if (state.delayTimer > 0) state.delayTimer--;
+    if (state.soundTimer > 0) {
+        state.soundTimer--;
+        // TODO: audio
     }
 }

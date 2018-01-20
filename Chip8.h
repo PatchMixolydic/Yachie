@@ -7,7 +7,8 @@ constexpr int PROGRAM_OFFSET = 0x200;
 constexpr int MEMORY_SIZE = 4096;
 constexpr int DISPLAY_WIDTH = 64;
 constexpr int DISPLAY_HEIGHT = 32;
-constexpr float TIMER_CLOCK_CYCLE = 1.f / 60.f;
+constexpr float TIMER_FREQUENCY = 1.f / 60.f; // Sound and delay timers are 60Hz
+constexpr float CPU_FREQUENCY = 1.f / 1000.f; // CPU frequency is ill defined, using 1KHz here
 constexpr uint8_t FONT_SET[] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -43,6 +44,8 @@ public:
     Chip8();
     void initState();
     void load(std::string filename);
+    void step();
+    void tickTimers();
     Chip8State state;
 };
 
