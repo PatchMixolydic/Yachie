@@ -2,6 +2,7 @@
 #include <iterator>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include "Chip8.h"
 
 Chip8::Chip8() {
@@ -39,8 +40,8 @@ void Chip8::load(std::string filename) {
     }
 }
 
-int Chip8::step() {
-    uint16_t opcode = getOpcode();
+void Chip8::step() {
+    uint16_t opcode = state.memory[state.pc] << 8 | state.memory[state.pc + 1];
     state.pc += 2;
     if (opcode == 0x00E0) {
         std::cout << "CLS" << std::endl; // CLS
@@ -55,19 +56,22 @@ int Chip8::step() {
     } else if (opidx(opcode) == 0x3) {
         std::cout << "SE V" << std::hex << x(opcode) << ", " << lowByte(opcode) << std::endl; // Skip next instruction if Vx = byte
     } else {
-        return ERR_INVALID_OPCODE;
+        std::stringstream message;
+        message << std::hex;
+        message << "Unknown opcode ";
+        message << opcode;
+        message << " at 0x";
+        message << (state.pc - 2);
+        throw std::runtime_error(message.str());
     }
-    return ERR_SUCCESS;
 }
 
 void Chip8::tickTimers() {
-    if (state.delayTimer > 0) state.delayTimer--;
+    if (state.delayTimer > 0) {
+        state.delayTimer--;
+    }
     if (state.soundTimer > 0) {
         state.soundTimer--;
         // TODO: audio
     }
-}
-
-uint16_t Chip8::getOpcode() {
-    return state.memory[state.pc] << 8 | state.memory[state.pc + 1];
 }

@@ -27,8 +27,6 @@ constexpr uint8_t FONT_SET[] = {
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
-constexpr int ERR_SUCCESS           =   0;
-constexpr int ERR_INVALID_OPCODE    =  -1;
 
 struct Chip8State {
     uint8_t memory[MEMORY_SIZE];
@@ -46,9 +44,8 @@ public:
     Chip8();
     void initState();
     void load(std::string filename);
-    int step();
+    void step();
     void tickTimers();
-    uint16_t getOpcode();
     Chip8State state;
 
 private:
