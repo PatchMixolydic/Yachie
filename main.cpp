@@ -1,9 +1,10 @@
-#define SDL_MAIN_HANDLED
-
 #include <iostream>
-#include <SDL2/SDL.h>
+#include "Chip8.h"
 
 int main() {
-    std::cout << "Hello" << std::endl;
+    Chip8 cpu;
+    for (uint8_t mem : cpu.state.memory) {
+        std::cout << (int)mem << " ";
+    }
     return 0;
 }
