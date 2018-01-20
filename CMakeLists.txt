@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(Chip8)
+project(yachie)
 
 set(INCLUDE_DIR "C:/C++ Libs/include" CACHE FILEPATH "Includes directory")
 set(LIBS_DIR "C:/C++ Libs/lib" CACHE FILEPATH "Library directory")
@@ -13,14 +13,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 #     set(GUI_TYPE MACOSX_BUNDLE)
 # endif(APPLE)
 
-set_property(GLOBAL PROPERTY VS_STARTUP_PROJECT Chip8)
+set_property(GLOBAL PROPERTY VS_STARTUP_PROJECT yachie)
 
 include_directories(${INCLUDE_DIR})
 link_directories(${LIBS_DIR})
 
-add_executable(Chip8 ${GUI_TYPE} main.cpp Chip8.cpp Chip8.h Display.cpp Display.h)
+add_executable(yachie ${GUI_TYPE} main.cpp Chip8.cpp Chip8.h Display.cpp Display.h)
 
-target_link_libraries (Chip8
+target_link_libraries (yachie
     sfml-graphics
     sfml-window
     sfml-system
