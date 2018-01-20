@@ -39,8 +39,8 @@ void Chip8::load(std::string filename) {
     }
 }
 
-void Chip8::step() {
-    std::cout << "Step" << std::endl;
+int Chip8::step() {
+    return ERR_SUCCESS;
 }
 
 void Chip8::tickTimers() {
