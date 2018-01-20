@@ -42,6 +42,7 @@ class Chip8 {
 public:
     Chip8();
     void initState();
+    void load(std::string filename);
     Chip8State state;
 };
 
