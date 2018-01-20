@@ -8,6 +8,7 @@ Chip-8 Emulator written in C++. Not done yet.
 
 ## Usage
 `yachie [rom]` will open a rom file.
+
 `yachie` will just open the emulator. Right now there is no way to load a rom file from this state.
 
 ## Todo
