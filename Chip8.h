@@ -48,7 +48,19 @@ public:
     void load(std::string filename);
     int step();
     void tickTimers();
+    uint16_t getOpcode();
     Chip8State state;
+
+private:
+    // Convenience functions
+    inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;}
+    inline uint16_t addr(uint16_t op) {return op & 0x0FFF;}
+    inline uint16_t nibble(uint16_t op) {return op & 0x000F;}
+    inline uint16_t x(uint16_t op) {return (op & 0x0F00) >> 8;}
+    inline uint16_t y(uint16_t op) {return (op & 0x00F0) >> 4;}
+    inline uint16_t lowByte(uint16_t op) {return op & 0x00FF;}
+    inline uint16_t axxb(uint16_t op) {return op & 0xF00F;}
+    inline uint16_t axbc(uint16_t op) {return op & 0xF0FF;}
 };
 
 #endif //CHIP8_CHIP8_H

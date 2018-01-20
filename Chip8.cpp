@@ -40,6 +40,23 @@ void Chip8::load(std::string filename) {
 }
 
 int Chip8::step() {
+    uint16_t opcode = getOpcode();
+    state.pc += 2;
+    if (opcode == 0x00E0) {
+        std::cout << "CLS" << std::endl; // CLS
+    } else if (opcode == 0x00EE) {
+        std::cout << "RET" << std::endl; // RET
+    } else if (opidx(opcode) == 0x0) {
+        std::cout << "SYS " << std::hex << addr(opcode) << std::endl; // SYS, deprecated, just nop
+    } else if (opidx(opcode) == 0x1) {
+        std::cout << "JP " << std::hex << addr(opcode) << std::endl; // JMP
+    } else if (opidx(opcode) == 0x2) {
+        std::cout << "CALL " << std::hex << addr(opcode) << std::endl; // JSR
+    } else if (opidx(opcode) == 0x3) {
+        std::cout << "SE V" << std::hex << x(opcode) << ", " << lowByte(opcode) << std::endl; // Skip next instruction if Vx = byte
+    } else {
+        return ERR_INVALID_OPCODE;
+    }
     return ERR_SUCCESS;
 }
 
@@ -49,4 +66,8 @@ void Chip8::tickTimers() {
         state.soundTimer--;
         // TODO: audio
     }
+}
+
+uint16_t Chip8::getOpcode() {
+    return state.memory[state.pc] << 8 | state.memory[state.pc + 1];
 }

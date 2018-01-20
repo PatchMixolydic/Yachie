@@ -34,12 +34,13 @@ int main(int argc, char* argv[]) {
         }
 
         if (cpuTimer.getElapsedTime().asSeconds() > CPU_FREQUENCY) {
+            uint16_t opcode = cpu.getOpcode();
             int err = cpu.step();
             switch (err) {
                 case ERR_SUCCESS:
                     break;
                 case ERR_INVALID_OPCODE:
-                    std::cerr << "Invalid opcode at 0x" << std::hex << cpu.state.pc << std::endl;
+                    std::cerr << "Invalid opcode at 0x" << std::hex << cpu.state.pc << ": " << opcode << std::endl;
                     if (CLOSE_ON_UNKNOWN_OPCODE) window.close();
                     break;
                 default:
