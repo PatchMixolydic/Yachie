@@ -18,7 +18,7 @@ set_property(GLOBAL PROPERTY VS_STARTUP_PROJECT yachie)
 include_directories(${INCLUDE_DIR})
 link_directories(${LIBS_DIR})
 
-add_executable(yachie ${GUI_TYPE} main.cpp Chip8.cpp Chip8.h Display.cpp Display.h)
+add_executable(yachie ${GUI_TYPE} src/main.cpp src/Chip8.cpp src/Chip8.h src/Display.cpp src/Display.h)
 
 target_link_libraries (yachie
     sfml-graphics
