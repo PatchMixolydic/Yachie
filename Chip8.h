@@ -36,7 +36,7 @@ struct Chip8State {
     uint16_t pc;
     uint16_t sp;
     uint16_t stack[16];
-    bool vram[DISPLAY_HEIGHT][DISPLAY_WIDTH]; // values are stored y, x (col, row)
+    uint8_t vram[DISPLAY_HEIGHT][DISPLAY_WIDTH]; // values are stored y, x (col, row)
 };
 
 class Chip8 {
@@ -46,18 +46,17 @@ public:
     void load(std::string filename);
     void step();
     void tickTimers();
+    void clearVRAM();
     Chip8State state;
 
 private:
     // Convenience functions
-    inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;}
-    inline uint16_t addr(uint16_t op) {return op & 0x0FFF;}
-    inline uint16_t nibble(uint16_t op) {return op & 0x000F;}
-    inline uint16_t x(uint16_t op) {return (op & 0x0F00) >> 8;}
-    inline uint16_t y(uint16_t op) {return (op & 0x00F0) >> 4;}
-    inline uint16_t lowByte(uint16_t op) {return op & 0x00FF;}
-    inline uint16_t axxb(uint16_t op) {return op & 0xF00F;}
-    inline uint16_t axbc(uint16_t op) {return op & 0xF0FF;}
+    inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;} // X000
+    inline uint16_t addr(uint16_t op) {return op & 0x0FFF;} // 0XXX
+    inline uint16_t nibble(uint16_t op) {return op & 0x000F;} // 000X
+    inline uint16_t x(uint16_t op) {return (op & 0x0F00) >> 8;} // 0X00
+    inline uint16_t y(uint16_t op) {return (op & 0x00F0) >> 4;} // 00X0
+    inline uint16_t lowByte(uint16_t op) {return op & 0x00FF;} // 00XX
 };
 
 #endif //CHIP8_CHIP8_H
