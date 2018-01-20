@@ -27,6 +27,13 @@
 *.out
 *.app
 
+# CMake
+CMakeCache.txt
+cmake-build-debug
+
+# CLion
+.idea
+
 # =========================
 # Operating System Files
 # =========================
