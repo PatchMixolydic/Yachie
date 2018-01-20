@@ -18,7 +18,7 @@ set_property(GLOBAL PROPERTY VS_STARTUP_PROJECT Chip8)
 include_directories(${INCLUDE_DIR})
 link_directories(${LIBS_DIR})
 
-add_executable(Chip8 ${GUI_TYPE} main.cpp Chip8.cpp Chip8.h)
+add_executable(Chip8 ${GUI_TYPE} main.cpp Chip8.cpp Chip8.h Display.cpp Display.h)
 
 target_link_libraries (Chip8
     sfml-graphics

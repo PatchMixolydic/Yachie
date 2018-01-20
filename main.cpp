@@ -1,11 +1,10 @@
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include "Chip8.h"
 
 constexpr bool CLOSE_ON_UNKNOWN_OPCODE = false;
 
 int main(int argc, char* argv[]) {
-    sf::Window window(sf::VideoMode(DISPLAY_WIDTH, DISPLAY_HEIGHT), "Chip-8"); // TODO: placeholder, move to display class probably
+    Display display;
     Chip8 cpu;
     sf::Clock cpuTimer;
     sf::Clock delayTimer;
@@ -20,16 +19,17 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    while (window.isOpen()) {
+    while (display.window.isOpen()) {
         sf::Event event; // NOLINT
-        while (window.pollEvent(event)) {
+        while (display.window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
-                window.close();
+                display.window.close();
             }
         }
 
         if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
             cpu.tickTimers();
+            display.draw(cpu.state.vram);
             delayTimer.restart();
         }
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
             } catch (const std::runtime_error& e) {
                 std::cerr << e.what() << std::endl;
                 if (CLOSE_ON_UNKNOWN_OPCODE) {
-                    window.close();
+                    display.window.close();
                 }
             }
             cpuTimer.restart();

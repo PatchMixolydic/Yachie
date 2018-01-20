@@ -136,7 +136,7 @@ void Chip8::tickTimers() {
 }
 
 void Chip8::clearVRAM() {
-    for (uint8_t* row : state.vram) {
-        std::fill(row, row + DISPLAY_WIDTH, 0);
+    for (auto& row : state.vram) {
+        std::fill(row.begin(), row.end(), 0);
     }
 }
