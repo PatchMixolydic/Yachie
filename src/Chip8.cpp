@@ -36,6 +36,7 @@ void Chip8::load(std::string filename) {
         state.memory[offset] = (uint8_t)c;
         offset++;
     }
+    romLoaded = true;
 }
 
 void Chip8::step() {

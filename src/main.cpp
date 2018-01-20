@@ -27,25 +27,27 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
-            cpu.tickTimers();
-            display.draw(cpu.state.vram);
-            delayTimer.restart();
-        }
+        if (cpu.romLoaded) {
+            if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
+                cpu.tickTimers();
+                display.draw(cpu.state.vram);
+                delayTimer.restart();
+            }
 
-        if (cpuTimer.getElapsedTime().asSeconds() > CPU_FREQUENCY) {
-            try {
-                cpu.step(); // TODO: only step the CPU if a ROM is loaded. Right now this will crash when the PC goes out of bounds
-            } catch (const std::runtime_error& e) {
-                std::cerr << e.what() << std::endl;
-                if (CLOSE_ON_UNKNOWN_OPCODE) {
+            if (cpuTimer.getElapsedTime().asSeconds() > CPU_FREQUENCY) {
+                try {
+                    cpu.step();
+                } catch (const std::runtime_error& e) {
+                    std::cerr << e.what() << std::endl;
+                    if (CLOSE_ON_UNKNOWN_OPCODE) {
+                        display.window.close();
+                    }
+                } catch (const std::exception& e) {
+                    std::cerr << e.what() << std::endl;
                     display.window.close();
                 }
-            } catch (const std::exception& e) {
-                std::cerr << e.what() << std::endl;
-                display.window.close();
+                cpuTimer.restart();
             }
-            cpuTimer.restart();
         }
     }
 

@@ -49,6 +49,7 @@ public:
     void tickTimers();
     void clearVRAM();
     Chip8State state;
+    bool romLoaded = false;
 
 private:
     // Convenience functions
