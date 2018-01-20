@@ -7,6 +7,7 @@
 
 constexpr int PROGRAM_OFFSET = 0x200;
 constexpr int MEMORY_SIZE = 4096;
+constexpr int OPCODE_SIZE = 2;
 constexpr float TIMER_FREQUENCY = 1.f / 60.f; // Sound and delay timers are 60Hz
 constexpr float CPU_FREQUENCY = 1.f / 1000.f; // CPU frequency is ill defined, using 1KHz here
 constexpr uint8_t FONT_SET[] = {
@@ -53,10 +54,10 @@ private:
     // Convenience functions
     inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;} // X000
     inline uint16_t addr(uint16_t op) {return op & 0x0FFF;} // 0XXX
-    inline uint16_t nibble(uint16_t op) {return op & 0x000F;} // 000X
+    inline uint8_t nibble(uint16_t op) {return uint8_t(op & 0x000F);} // 000X
     inline uint16_t x(uint16_t op) {return (op & 0x0F00) >> 8;} // 0X00
     inline uint16_t y(uint16_t op) {return (op & 0x00F0) >> 4;} // 00X0
-    inline uint16_t lowByte(uint16_t op) {return op & 0x00FF;} // 00XX
+    inline uint8_t lowByte(uint16_t op) {return uint8_t(op & 0x00FF);} // 00XX
 };
 
 #endif //CHIP8_CHIP8_H
