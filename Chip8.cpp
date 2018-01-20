@@ -24,13 +24,11 @@ void Chip8::initState() {
 }
 
 void Chip8::load(std::string filename) {
-    std::ifstream romFile(filename, std::ios::in | std::ios::binary | std::ios::ate);
+    std::ifstream romFile(filename, std::ios::in | std::ios::binary);
     if (!romFile.is_open()) {
         std::cerr << "Couldn't load rom " << filename << std::endl;
         return;
     }
-    std::streampos romSize = romFile.tellg(); // kind of a hack to get the rom's size
-    romFile.seekg(0, std::ios::beg);
     // seems hacky, that's what I get for using uint8_t
     char c;
     int offset = PROGRAM_OFFSET;
