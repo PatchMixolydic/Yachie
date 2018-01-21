@@ -46,19 +46,22 @@ int main(int argc, char* argv[]) {
                     for (int i = 0; i < NUMBER_OF_KEYS; i++) {
                         if (event.key.code == KEYMAP[i]) {
                             cpu.keyInput(i);
+                            break;
                         }
                     }
                 }
             }
         }
 
-        if (cpu.state.running) {
-            if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
+        if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
+            if (cpu.state.running) {
                 cpu.tickTimers();
-                display.draw(cpu.state.vram);
-                delayTimer.restart();
             }
+            display.draw(cpu.state.vram);
+            delayTimer.restart();
+        }
 
+        if (cpu.state.running) {
             if (cpuTimer.getElapsedTime().asSeconds() > CPU_FREQUENCY) {
                 try {
                     for (int i = 0; i < NUMBER_OF_KEYS; i++) {
