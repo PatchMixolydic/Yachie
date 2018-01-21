@@ -32,6 +32,10 @@ int main(int argc, char* argv[]) {
         while (display.window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 display.window.close();
+            } else if (event.type == sf::Event::KeyPressed) {
+                if (event.key.control && event.key.code == sf::Keyboard::O) {
+                    openROM(cpu);
+                }
             }
         }
 

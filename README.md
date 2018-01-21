@@ -11,6 +11,8 @@ Chip-8 Emulator written in C++. Not done yet.
 
 `yachie` will open the emulator and prompt you to open a ROM.
 
+Press CTRL+O to open a different ROM.
+
 ## Todo
 * Implement keypad
 
