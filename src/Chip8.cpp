@@ -39,7 +39,7 @@ void Chip8::load(std::string filename) {
         state.memory[offset] = (uint8_t)c;
         offset++;
     }
-    running = true;
+    state.running = true;
 }
 
 void Chip8::step() {
@@ -151,15 +151,22 @@ void Chip8::step() {
             }
         }
     } else if (opidx(opcode) == 0xE && lowByte(opcode) == 0x9E) {
-        std::cout << std::hex << "SKP V" << x(opcode) << std::endl; // Skip next instruction if key [Vx] is pressed TODO
+        // Skip next instruction if key [Vx] is pressed
+        if (state.input[state.v[x(opcode)]]) {
+            state.pc += 2;
+        }
     } else if (opidx(opcode) == 0xE && lowByte(opcode) == 0xA1) {
-        std::cout << std::hex << "SKNP V" << x(opcode) << std::endl; // Skip next instruction if key [Vx] is not pressed TODO
+        // Skip next instruction if key [Vx] is not pressed
+        if (!state.input[state.v[x(opcode)]]) {
+            state.pc += 2;
+        }
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x07) {
         // Load the value of the delay timer into Vx
         state.v[x(opcode)] = state.delayTimer;
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x0A) {
-        // Halt execution until next keypress, store keypress in Vx TODO
-        running = false;
+        // Halt execution until next keypress, store keypress in Vx
+        state.running = false;
+        state.acceptingInputInto = x(opcode);
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x15) {
         // Load Vx into the delay timer
         state.delayTimer = state.v[x(opcode)];
@@ -239,4 +246,13 @@ uint16_t Chip8::popFromStack() {
     uint16_t res = state.stack[state.sp];
     state.sp++;
     return res;
+}
+
+void Chip8::keyInput(uint8_t keyId) {
+    if (state.acceptingInputInto == -1) {
+        return;
+    }
+    state.v[state.acceptingInputInto] = keyId;
+    state.acceptingInputInto = -1;
+    state.running = true;
 }

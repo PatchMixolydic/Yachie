@@ -9,6 +9,7 @@ constexpr int PROGRAM_OFFSET = 0x200;
 constexpr int MEMORY_SIZE = 4096;
 constexpr int OPCODE_SIZE = 2;
 constexpr int STACK_SIZE = 16;
+constexpr int NUMBER_OF_KEYS = 16;
 constexpr float TIMER_FREQUENCY = 1.f / 60.f; // Sound and delay timers are 60Hz
 constexpr float CPU_FREQUENCY = 1.f / 1000.f; // CPU frequency is ill defined, using 1KHz here
 constexpr uint8_t FONT_SET[] = {
@@ -40,6 +41,9 @@ struct Chip8State {
     uint16_t i;
     uint16_t stack[STACK_SIZE];
     vram_t vram; // values are stored y, x (col, row)
+    bool input[NUMBER_OF_KEYS];
+    bool running = false;
+    int acceptingInputInto = -1;
 };
 
 class Chip8 {
@@ -50,8 +54,8 @@ public:
     void step();
     void tickTimers();
     void clearVRAM();
+    void keyInput(uint8_t keyId);
     Chip8State state;
-    bool running = false;
 
 private:
     void pushToStack(uint16_t address);
