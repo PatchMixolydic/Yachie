@@ -8,6 +8,7 @@
 constexpr int PROGRAM_OFFSET = 0x200;
 constexpr int MEMORY_SIZE = 4096;
 constexpr int OPCODE_SIZE = 2;
+constexpr int STACK_SIZE = 16;
 constexpr float TIMER_FREQUENCY = 1.f / 60.f; // Sound and delay timers are 60Hz
 constexpr float CPU_FREQUENCY = 1.f / 1000.f; // CPU frequency is ill defined, using 1KHz here
 constexpr uint8_t FONT_SET[] = {
@@ -36,7 +37,8 @@ struct Chip8State {
     uint8_t delayTimer;
     uint16_t pc;
     uint16_t sp;
-    uint16_t stack[16];
+    uint16_t i;
+    uint16_t stack[STACK_SIZE];
     vram_t vram; // values are stored y, x (col, row)
 };
 
@@ -49,9 +51,12 @@ public:
     void tickTimers();
     void clearVRAM();
     Chip8State state;
-    bool romLoaded = false;
+    bool running = false;
 
 private:
+    void pushToStack(uint16_t address);
+    uint16_t popFromStack();
+    bool checkSPInBounds();
     // Convenience functions
     inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;} // X000
     inline uint16_t addr(uint16_t op) {return op & 0x0FFF;} // 0XXX

@@ -1,8 +1,6 @@
 #include <iostream>
 #include "Chip8.h"
 
-constexpr bool CLOSE_ON_UNKNOWN_OPCODE = false;
-
 int main(int argc, char* argv[]) {
     Display display;
     Chip8 cpu;
@@ -27,7 +25,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (cpu.romLoaded) {
+        if (cpu.running) {
             if (delayTimer.getElapsedTime().asSeconds() > TIMER_FREQUENCY) {
                 cpu.tickTimers();
                 display.draw(cpu.state.vram);
@@ -37,11 +35,6 @@ int main(int argc, char* argv[]) {
             if (cpuTimer.getElapsedTime().asSeconds() > CPU_FREQUENCY) {
                 try {
                     cpu.step();
-                } catch (const std::runtime_error& e) {
-                    std::cerr << e.what() << std::endl;
-                    if (CLOSE_ON_UNKNOWN_OPCODE) {
-                        display.window.close();
-                    }
                 } catch (const std::exception& e) {
                     std::cerr << e.what() << std::endl;
                     display.window.close();

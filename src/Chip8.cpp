@@ -7,16 +7,19 @@
 
 Chip8::Chip8() {
     initState();
+    // Seed RNG
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 void Chip8::initState() {
     // Clear registers
     state.delayTimer = 0;
     state.soundTimer = 0;
-    state.sp = 0x0F; // Point to the top of the stack
+    state.sp = STACK_SIZE; // Point to the top of the stack
     state.pc = PROGRAM_OFFSET; // Point to the start of the program
     // Clear memory
     std::fill(state.memory, state.memory + MEMORY_SIZE, 0);
+    std::fill(state.stack, state.stack + STACK_SIZE, 0);
     clearVRAM();
     // Put font into ROM
     std::copy(std::begin(FONT_SET), std::end(FONT_SET), std::begin(state.memory));
@@ -36,7 +39,7 @@ void Chip8::load(std::string filename) {
         state.memory[offset] = (uint8_t)c;
         offset++;
     }
-    romLoaded = true;
+    running = true;
 }
 
 void Chip8::step() {
@@ -52,13 +55,17 @@ void Chip8::step() {
     if (opcode == 0x00E0) {
         clearVRAM(); // CLS
     } else if (opcode == 0x00EE) {
-        std::cout << "RET" << std::endl; // RET TODO
+        // RET
+        state.pc = popFromStack();
     } else if (opidx(opcode) == 0x0) {
         ; // SYS, deprecated, just nop
     } else if (opidx(opcode) == 0x1) {
-        std::cout << "JP " << std::hex << addr(opcode) << std::endl; // JMP TODO
+        // JMP
+        state.pc = addr(opcode);
     } else if (opidx(opcode) == 0x2) {
-        std::cout << "CALL " << std::hex << addr(opcode) << std::endl; // JSR TODO
+        // JSR
+        pushToStack(state.pc); // already points to next opcode
+        state.pc = addr(opcode);
     } else if (opidx(opcode) == 0x3) {
         // Skip next instruction if Vx = byte
         if (state.v[x(opcode)] == lowByte(opcode)) {
@@ -119,36 +126,69 @@ void Chip8::step() {
             state.pc += OPCODE_SIZE;
         }
     } else if (opidx(opcode) == 0xA) {
-        std::cout << std::hex << "LD I, $" << addr(opcode) << std::endl; // load ram at addr into I TODO
+        // load addr into I
+        state.i = addr(opcode);
     } else if (opidx(opcode) == 0xB) {
-        std::cout << std::hex << "JP V0, $" << addr(opcode) << std::endl; // jump to addr + v0 TODO
+        // jump to addr + v0
+        state.pc = addr(opcode) + state.v[0];
     } else if (opidx(opcode) == 0xC) {
-        std::cout << std::hex << "RND V" << x(opcode) << ", " << lowByte(opcode) << std::endl; // Random uint8 & Vx TODO
+        // Random uint8 & Vx
+        state.v[x(opcode)] &= rand() % 256; // C random is discouraged but should be fine for an insecure PRNG
     } else if (opidx(opcode) == 0xD) {
-        std::cout << std::hex << "DRW V" << x(opcode) << ", V" << y(opcode) << ", " << nibble(opcode) << std::endl;
-        // Read [nibble] bytes from RAM starting at $[register I] and XOR them into VRAM at (Vx, Vy), wrapping on OOB TODO
+        // Read [nibble] bytes from RAM starting at $[register I] and XOR them into VRAM at (Vx, Vy), wrapping on OOB
+        state.v[0xf] = 0; // set on sprite collision
+        for (int yIdx = 0; yIdx < nibble(opcode); yIdx++) {
+            uint8_t row = state.memory[state.i + yIdx];
+            int yCoord = (state.v[y(opcode)] + yIdx) % DISPLAY_HEIGHT;
+            for (int xIdx = 0; xIdx <= 8; xIdx++) {
+                int xCoord = (state.v[x(opcode)] + xIdx) % DISPLAY_WIDTH;
+                if ((row & (0x80 >> xIdx)) != 0) {
+                    if (state.vram[yCoord][xCoord] != 0) {
+                        state.v[0xf] = 1;
+                    }
+                    state.vram[yCoord][xCoord] ^= 1;
+                }
+            }
+        }
     } else if (opidx(opcode) == 0xE && lowByte(opcode) == 0x9E) {
         std::cout << std::hex << "SKP V" << x(opcode) << std::endl; // Skip next instruction if key [Vx] is pressed TODO
     } else if (opidx(opcode) == 0xE && lowByte(opcode) == 0xA1) {
         std::cout << std::hex << "SKNP V" << x(opcode) << std::endl; // Skip next instruction if key [Vx] is not pressed TODO
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x07) {
-        std::cout << std::hex << "LD V" << x(opcode) << ", DT" << std::endl; // Load the value of the delay timer into Vx TODO
+        // Load the value of the delay timer into Vx
+        state.v[x(opcode)] = state.delayTimer;
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x0A) {
-        std::cout << std::hex << "LD V" << x(opcode) << ", K" << std::endl; // Halt execution until next keypress, store keypress in Vx TODO
+        // Halt execution until next keypress, store keypress in Vx TODO
+        running = false;
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x15) {
-        std::cout << std::hex << "LD DT, V" << x(opcode) << std::endl; // Load Vx into the delay timer TODO
+        // Load Vx into the delay timer
+        state.delayTimer = state.v[x(opcode)];
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x18) {
-        std::cout << std::hex << "LD ST, V" << x(opcode) << std::endl; // Load Vx into the sound timer TODO
+        // Load Vx into the sound timer
+        state.soundTimer = state.v[x(opcode)];
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x1E) {
-        std::cout << std::hex << "ADD I, V" << x(opcode) << std::endl; // Add Vx into I TODO
+        // Add Vx into I
+        state.i += state.v[x(opcode)];
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x29) {
-        std::cout << std::hex << "LD F, V" << x(opcode) << std::endl; // Load the address of digit Vx into I TODO
+        // Load the address of digit Vx into I
+        state.i = 0x5 * state.v[x(opcode)]; // 0x5 is the size of a character in bytes
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x33) {
-        std::cout << std::hex << "LD B, V" << x(opcode) << std::endl; // Load BCD version of Vx into I, I+1, I+2 TODO
+        // Load BCD version of Vx into I, I+1, I+2
+        uint8_t vx = state.v[x(opcode)];
+        for (int i = 2; i >= 0; i--) {
+            state.memory[state.i + i] = vx % 10; // 240 -> 0
+            vx /= 10; // 240 -> 24
+        }
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x55) {
-        std::cout << std::hex << "LD I, V" << x(opcode) << std::endl; // Load V0-Vx into memory at $I TODO
+        // Load V0-Vx into memory at $I
+        for (int reg = 0; reg <= x(opcode); reg++) {
+            state.memory[state.i + reg] = state.v[reg];
+        }
     } else if (opidx(opcode) == 0xF && lowByte(opcode) == 0x65) {
-        std::cout << std::hex << "LD V" << x(opcode) << ", I" << std::endl; // Load registers V0-Vx from $I TODO
+        // Load registers V0-Vx from $I
+        for (int reg = 0; reg <= x(opcode); reg++) {
+            state.v[reg] = state.memory[state.i + reg];
+        }
     } else {
         std::stringstream message;
         message << std::hex;
@@ -174,4 +214,29 @@ void Chip8::clearVRAM() {
     for (auto& row : state.vram) {
         std::fill(row.begin(), row.end(), 0);
     }
+}
+
+void Chip8::pushToStack(uint16_t address) {
+    if (state.sp <= 0) { // Stack is full
+        std::cerr << "Tried to push with a full stack, ignoring" << std::endl;
+        return;
+    } else if (state.sp > STACK_SIZE) { // Stack pointer out of bounds
+        std::cerr << "Stack pointer out of bounds, resetting to sane value" << std::endl;
+        state.sp = STACK_SIZE;
+    }
+    state.sp--;
+    state.stack[state.sp] = address;
+}
+
+uint16_t Chip8::popFromStack() {
+    if (state.sp <= 0) { // Stack pointer out of bounds
+        std::cerr << "Stack pointer out of bounds, resetting to sane value" << std::endl;
+        state.sp = 0;
+    } else if (state.sp >= STACK_SIZE) { // Stack is empty
+        std::cerr << "Tried to pop with an empty stack, returning 0" << std::endl;
+        return 0;
+    }
+    uint16_t res = state.stack[state.sp];
+    state.sp++;
+    return res;
 }
