@@ -116,7 +116,7 @@ void Chip8::step() {
         // sub Vx from Vy and store result in Vx, VF is 1 if Vy > Vx
         state.v[0xF] = state.v[y(opcode)] > state.v[x(opcode)];
         state.v[x(opcode)] = state.v[y(opcode)] - state.v[x(opcode)];
-    } else if (opidx(opcode) == 0x8 && nibble(opcode) == 0x6) {
+    } else if (opidx(opcode) == 0x8 && nibble(opcode) == 0xE) {
         // If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
         state.v[0xF] = (state.v[y(opcode)] & 0b10000000) >> 7;
         state.v[x(opcode)] = state.v[y(opcode)] << 1;
