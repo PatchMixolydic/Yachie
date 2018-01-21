@@ -1,5 +1,13 @@
 #include <iostream>
 #include "Chip8.h"
+#include "tinyfiledialogs.h"
+
+void openROM(Chip8& cpu) {
+    const char* filename = tinyfd_openFileDialog("Open ROM", nullptr, 0, nullptr, nullptr, 0); // Sorry about the default location...
+    if (filename != nullptr) {
+        cpu.load(filename);
+    }
+}
 
 int main(int argc, char* argv[]) {
     Display display;
@@ -15,6 +23,8 @@ int main(int argc, char* argv[]) {
         } else {
             cpu.load(arg);
         }
+    } else {
+        openROM(cpu);
     }
 
     while (display.window.isOpen()) {

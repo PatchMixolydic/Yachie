@@ -56,7 +56,6 @@ public:
 private:
     void pushToStack(uint16_t address);
     uint16_t popFromStack();
-    bool checkSPInBounds();
     // Convenience functions
     inline uint16_t opidx(uint16_t op) {return (op & 0xF000) >> 12;} // X000
     inline uint16_t addr(uint16_t op) {return op & 0x0FFF;} // 0XXX
