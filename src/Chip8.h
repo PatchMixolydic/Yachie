@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <random>
 #include "Display.h"
 
 constexpr int PROGRAM_OFFSET = 0x200;
@@ -67,6 +68,9 @@ private:
     inline uint16_t x(uint16_t op) {return (op & 0x0F00) >> 8;} // 0X00
     inline uint16_t y(uint16_t op) {return (op & 0x00F0) >> 4;} // 00X0
     inline uint8_t lowByte(uint16_t op) {return uint8_t(op & 0x00FF);} // 00XX
+    std::random_device device;
+    std::mt19937 rng;
+    std::uniform_int_distribution<int> randomDistribution;
 };
 
 #endif //CHIP8_CHIP8_H

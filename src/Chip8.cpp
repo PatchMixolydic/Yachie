@@ -5,10 +5,8 @@
 #include <sstream>
 #include "Chip8.h"
 
-Chip8::Chip8() {
+Chip8::Chip8() : rng(device()), randomDistribution(0, 255) {
     initState();
-    // Seed RNG
-    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 void Chip8::initState() {
@@ -133,7 +131,7 @@ void Chip8::step() {
         state.pc = addr(opcode) + state.v[0];
     } else if (opidx(opcode) == 0xC) {
         // Random uint8 & Vx
-        state.v[x(opcode)] &= rand() % 256; // C random is discouraged but should be fine for an insecure PRNG
+        state.v[x(opcode)] = randomDistribution(rng) & lowByte(opcode);
     } else if (opidx(opcode) == 0xD) {
         // Read [nibble] bytes from RAM starting at $[register I] and XOR them into VRAM at (Vx, Vy), wrapping on OOB
         state.v[0xf] = 0; // set on sprite collision
