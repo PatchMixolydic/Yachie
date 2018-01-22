@@ -23,4 +23,6 @@ target_link_libraries (yachie
     sfml-graphics
     sfml-window
     sfml-system
+    -static-libgcc
+    -static-libstdc++
 )
