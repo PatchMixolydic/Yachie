@@ -30,6 +30,10 @@
 # CMake
 CMakeCache.txt
 cmake-build-debug
+bin
+*.cmake
+CMakeFiles
+Makefile
 
 # CLion
 .idea
