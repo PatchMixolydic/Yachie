@@ -7,11 +7,11 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "CompanyName", "William Lord"
+      VALUE "CompanyName", "Ruby Lord"
       VALUE "FileDescription", "Chip-8 Emulator"
       VALUE "FileVersion", "1.0"
       VALUE "InternalName", "yachie"
-      VALUE "LegalCopyright", "William Lord"
+      VALUE "LegalCopyright", "Ruby Lord"
       VALUE "OriginalFilename", "yachie.exe"
       VALUE "ProductName", "Yachie"
       VALUE "ProductVersion", "1.0.2"
